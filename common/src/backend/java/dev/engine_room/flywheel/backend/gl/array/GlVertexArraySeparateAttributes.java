@@ -64,9 +64,9 @@ public class GlVertexArraySeparateAttributes extends GlVertexArray {
 
 			if (!attribute.equals(attributes[attribIndex])) {
 				if (attribute instanceof VertexAttribute.Float f) {
-					GL43C.glVertexAttribFormat(attribIndex, f.size(), GlConst.toGl(f.type()), f.normalized(), offset);
+					GL43C.glVertexAttribFormat(attribIndex, f.size(), f.type().glType(), f.normalized(), offset);
 				} else if (attribute instanceof VertexAttribute.Int vi) {
-					GL43C.glVertexAttribIFormat(attribIndex, vi.size(), GlConst.toGl(vi.type()), offset);
+					GL43C.glVertexAttribIFormat(attribIndex, vi.size(), vi.type().glType(), offset);
 				}
 				attributes[attribIndex] = attribute;
 			}

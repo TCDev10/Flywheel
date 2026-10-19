@@ -1,31 +1,42 @@
 package dev.engine_room.flywheel.backend.gl.array;
 
-import com.mojang.blaze3d.vertex.VertexFormatElement;
-
 public sealed interface VertexAttribute {
 	int byteWidth();
 
-	/**
-	 * A bindable attribute in a vertex array.
-	 *
-	 * @param type       The type of the attribute, e.g. GL_FLOAT.
-	 * @param size       The number of components in the attribute, e.g. 3 for a vec3.
-	 * @param normalized Whether the data is normalized.
-	 */
-	record Float(VertexFormatElement.Type type, int size, boolean normalized) implements VertexAttribute {
+	public enum Type {
+		BYTE(1, 0x1400),
+		UBYTE(1, 0x1401),
+		SHORT(2, 0x1402),
+		USHORT(2, 0x1403),
+		INT(4, 0x1404),
+		UINT(4, 0x1405),
+		FLOAT(4, 0x1406);
+
+		private final int size;
+		private final int glType;
+
+		Type(int size, int glType) {
+			this.size = size;
+			this.glType = glType;
+		}
+
+		public int size() {
+			return size;
+		}
+
+		public int glType() {
+			return glType;
+		}
+	}
+
+	record Float(Type type, int size, boolean normalized) implements VertexAttribute {
 		@Override
 		public int byteWidth() {
 			return size * type.size();
 		}
 	}
 
-	/**
-	 * A bindable attribute in a vertex array.
-	 *
-	 * @param type The type of the attribute, e.g. GL_INT.
-	 * @param size The number of components in the attribute, e.g. 3 for a vec3.
-	 */
-	record Int(VertexFormatElement.Type type, int size) implements VertexAttribute {
+	record Int(Type type, int size) implements VertexAttribute {
 		@Override
 		public int byteWidth() {
 			return size * type.size();

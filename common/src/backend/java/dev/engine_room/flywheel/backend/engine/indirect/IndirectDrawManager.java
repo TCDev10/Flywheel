@@ -151,7 +151,7 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
 		lightBuffers.bind();
 		matrixBuffer.bind();
 		Uniforms.bindAll();
-		TextureBinder.bindRenderTarget(Minecraft.getInstance().getMainRenderTarget());
+		TextureBinder.bindRenderTarget(Minecraft.getInstance().gameRenderer.mainRenderTarget());
 
 		for (var group : cullingGroups.values()) {
 			group.submitSolid();
@@ -245,7 +245,7 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
 		// Set up the crumbling program buffers. Nothing changes here between draws.
 		GlBufferType.DRAW_INDIRECT_BUFFER.bind(crumblingDrawBuffer.handle());
 		GL30.glBindBufferRange(GL43.GL_SHADER_STORAGE_BUFFER, BufferBindings.DRAW, crumblingDrawBuffer.handle(), 0, IndirectBuffers.DRAW_COMMAND_STRIDE);
-		TextureBinder.bindRenderTarget(Minecraft.getInstance().getMainRenderTarget());
+		TextureBinder.bindRenderTarget(Minecraft.getInstance().gameRenderer.mainRenderTarget());
 
 		for (var groupEntry : byType.entrySet()) {
 			var byProgress = groupEntry.getValue();
@@ -292,7 +292,7 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
 	@Override
 	public void triggerFallback() {
 		IndirectPrograms.kill();
-		Minecraft.getInstance().levelRenderer.allChanged();
+		Minecraft.getInstance().levelRenderer.resetLevelRenderData();
 	}
 
 	@Override

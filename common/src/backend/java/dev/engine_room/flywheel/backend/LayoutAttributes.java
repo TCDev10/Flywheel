@@ -80,31 +80,31 @@ public class LayoutAttributes {
 		}
 	}
 
-	private static VertexFormatElement.Type toGlType(IntegerRepr repr) {
+	private static VertexAttribute.Type toGlType(IntegerRepr repr) {
 		return switch (repr) {
-			case BYTE -> VertexFormatElement.Type.BYTE;
-			case SHORT -> VertexFormatElement.Type.SHORT;
-			case INT -> VertexFormatElement.Type.INT;
+			case BYTE -> VertexAttribute.Type.BYTE;
+			case SHORT -> VertexAttribute.Type.SHORT;
+			case INT -> VertexAttribute.Type.INT;
 		};
 	}
 
-	private static VertexFormatElement.Type toGlType(UnsignedIntegerRepr repr) {
+	private static VertexAttribute.Type toGlType(UnsignedIntegerRepr repr) {
 		return switch (repr) {
-			case UNSIGNED_BYTE -> VertexFormatElement.Type.UBYTE;
-			case UNSIGNED_SHORT -> VertexFormatElement.Type.USHORT;
-			case UNSIGNED_INT -> VertexFormatElement.Type.UINT;
+			case UNSIGNED_BYTE -> VertexAttribute.Type.UBYTE;
+			case UNSIGNED_SHORT -> VertexAttribute.Type.USHORT;
+			case UNSIGNED_INT -> VertexAttribute.Type.UINT;
 		};
 	}
 
-	private static VertexFormatElement.Type toGlType(FloatRepr repr) {
+	private static VertexAttribute.Type toGlType(FloatRepr repr) {
 		return switch (repr) {
-			case BYTE, NORMALIZED_BYTE -> VertexFormatElement.Type.BYTE;
-			case UNSIGNED_BYTE, NORMALIZED_UNSIGNED_BYTE -> VertexFormatElement.Type.UBYTE;
-			case SHORT, NORMALIZED_SHORT -> VertexFormatElement.Type.SHORT;
-			case UNSIGNED_SHORT, NORMALIZED_UNSIGNED_SHORT -> VertexFormatElement.Type.USHORT;
-			case INT, NORMALIZED_INT -> VertexFormatElement.Type.INT;
-			case UNSIGNED_INT, NORMALIZED_UNSIGNED_INT -> VertexFormatElement.Type.UINT;
-			case FLOAT -> VertexFormatElement.Type.FLOAT;
+			case BYTE, NORMALIZED_BYTE -> VertexAttribute.Type.BYTE;
+			case UNSIGNED_BYTE, NORMALIZED_UNSIGNED_BYTE -> VertexAttribute.Type.UBYTE;
+			case SHORT, NORMALIZED_SHORT -> VertexAttribute.Type.SHORT;
+			case UNSIGNED_SHORT, NORMALIZED_UNSIGNED_SHORT -> VertexAttribute.Type.USHORT;
+			case INT, NORMALIZED_INT -> VertexAttribute.Type.INT;
+			case UNSIGNED_INT, NORMALIZED_UNSIGNED_INT -> VertexAttribute.Type.UINT;
+			case FLOAT -> VertexAttribute.Type.FLOAT;
 		};
 	}
 

@@ -1,10 +1,12 @@
 package dev.engine_room.flywheel.backend.engine;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.opengl.GL33C;
 
+import com.mojang.blaze3d.opengl.FrameBufferAttachment;
 import com.mojang.blaze3d.opengl.GlConst;
 import com.mojang.blaze3d.opengl.GlDevice;
 import com.mojang.blaze3d.opengl.GlSampler;
@@ -61,9 +63,10 @@ public class TextureBinder {
 
 	public static void bindRenderTarget(RenderTarget target) {
 		GlTexture colorTexture = (GlTexture) target.getColorTexture();
-		int i = colorTexture.getFbo(
+		int i = GlUtil.getGlDevice().frameBufferCache().getFbo(
 				GlUtil.getGlDevice().directStateAccess(),
-				target.getDepthTexture()
+				List.of((FrameBufferAttachment) target.getColorTexture()),
+				(FrameBufferAttachment) target.getDepthTexture()
 		);
 		GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, i);
 	}

@@ -112,9 +112,9 @@ public abstract class GlVertexArrayGL3 extends GlVertexArray {
 		int stride = bindingStrides[bindingIndex];
 
 		if (attribute instanceof VertexAttribute.Float f) {
-			GlStateManager._vertexAttribPointer(attribIndex, f.size(), GlConst.toGl(f.type()), f.normalized(), stride, offset);
+			GlStateManager._vertexAttribPointer(attribIndex, f.size(), f.type().glType(), f.normalized(), stride, offset);
 		} else if (attribute instanceof VertexAttribute.Int vi) {
-			GlStateManager._vertexAttribIPointer(attribIndex, vi.size(), GlConst.toGl(vi.type()), stride, offset);
+			GlStateManager._vertexAttribIPointer(attribIndex, vi.size(), vi.type().glType(), stride, offset);
 		}
 
 		int divisor = bindingDivisors[bindingIndex];

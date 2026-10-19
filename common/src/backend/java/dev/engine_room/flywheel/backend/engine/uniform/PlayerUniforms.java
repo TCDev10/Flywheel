@@ -62,17 +62,14 @@ public final class PlayerUniforms extends UniformWriter {
 	}
 
 	private static long writeTeamColor(long ptr, @Nullable PlayerTeam team) {
-		if (team != null) {
-			Integer color = team.getColor().getColor();
-
-			if (color != null) {
-				int red = ARGB.red(color);
-				int green = ARGB.green(color);
-				int blue = ARGB.blue(color);
-				return writeVec4(ptr, red / 255f, green / 255f, blue / 255f, 1f);
-			} else {
-				return writeVec4(ptr, 1f, 1f, 1f, 1f);
-			}
+		if (team != null && team.getColor().isPresent()) {
+			int color = team.getColor().get().rgb();
+			int red = ARGB.red(color);
+			int green = ARGB.green(color);
+			int blue = ARGB.blue(color);
+			return writeVec4(ptr, red / 255f, green / 255f, blue / 255f, 1f);
+		} else if (team != null) {
+			return writeVec4(ptr, 1f, 1f, 1f, 1f);
 		} else {
 			return writeVec4(ptr, 1f, 1f, 1f, 0f);
 		}

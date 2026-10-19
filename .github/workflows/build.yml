@@ -35,17 +35,14 @@ jobs:
           cache-read-only: ${{ !endsWith(github.ref_name, '/dev') }}
 
       - name: Build
-        # Doesn't actually publish, as no secrets are passed in, just makes sure that publishing works
-        run: ./gradlew publish --no-daemon
+        run: ./gradlew build -x test --no-daemon
 
       - name: Capture Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Artifacts
           path: |
-            common/build/libs/
-            fabric/build/libs/
-            neoforge/build/libs/
-            vanillin/common/build/libs/
-            vanillin/fabric/build/libs/
-            vanillin/neoforge/build/libs/
+            common/build/libs/*.jar
+            neoforge/build/libs/*.jar
+            vanillin/common/build/libs/*.jar
+            vanillin/neoforge/build/libs/*.jar

@@ -275,30 +275,25 @@ public class VisualizationManagerImpl implements VisualizationManager {
 		lateInit().engine.render(context);
 	}
 
-	private void renderCrumbling(RenderContext context, Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress) {
-		if (destructionProgress.isEmpty()) {
+	private void renderCrumbling(RenderContext context) {
+		var blockBreakingStates = context.levelRenderState().blockBreakingRenderStates;
+		if (blockBreakingStates == null || blockBreakingStates.isEmpty()) {
 			return;
 		}
 
 		List<Engine.CrumblingBlock> crumblingBlocks = new ArrayList<>();
 
-		for (var entry : destructionProgress.long2ObjectEntrySet()) {
-			var set = entry.getValue();
-			if (set == null || set.isEmpty()) {
-				// Nothing to do if there's no crumbling.
-				continue;
-			}
+		for (var breakingState : blockBreakingStates) {
+			BlockPos pos = breakingState.blockPos();
+			long longPos = pos.asLong();
 
-			var visual = blockEntities.getStorage()
-					.visualAtPos(entry.getLongKey());
-
+			var visual = blockEntities.getStorage().visualAtPos(longPos);
 			if (visual == null) {
 				// The block doesn't have a visual, this is probably the common case.
 				continue;
 			}
 
 			List<Instance> instances = new ArrayList<>();
-
 			visual.collectCrumblingInstances(instance -> {
 				if (instance != null) {
 					instances.add(instance);
@@ -310,9 +305,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
 				continue;
 			}
 
-			var maxDestruction = set.last();
-
-			crumblingBlocks.add(new CrumblingBlockImpl(maxDestruction.getPos(), maxDestruction.getProgress(), instances));
+			crumblingBlocks.add(new CrumblingBlockImpl(pos, breakingState.progress(), instances));
 		}
 
 		if (!crumblingBlocks.isEmpty()) {
@@ -372,8 +365,8 @@ public class VisualizationManagerImpl implements VisualizationManager {
 		}
 
 		@Override
-		public void beforeSubmitCrumbling(RenderContext ctx, Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress) {
-			renderCrumbling(ctx, destructionProgress);
+		public void beforeSubmitCrumbling(RenderContext ctx) {
+			renderCrumbling(ctx);
 		}
 	}
 

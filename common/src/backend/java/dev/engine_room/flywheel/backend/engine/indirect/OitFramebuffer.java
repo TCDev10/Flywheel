@@ -1,8 +1,11 @@
 package dev.engine_room.flywheel.backend.engine.indirect;
 
+import java.util.List;
+
 import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL46;
 
+import com.mojang.blaze3d.opengl.FrameBufferAttachment;
 import com.mojang.blaze3d.opengl.GlConst;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.opengl.GlTexture;
@@ -50,14 +53,14 @@ public class OitFramebuffer {
 	public void prepare() {
 		RenderTarget renderTarget;
 
-		if (Minecraft.useShaderTransparency()) {
-			renderTarget = Minecraft.getInstance().levelRenderer.getItemEntityTarget();
+		if (Minecraft.getInstance().options.improvedTransparency().get()) {
+			renderTarget = Minecraft.getInstance().levelRenderer.itemEntityTarget();
 
 			renderTarget.copyDepthFrom(Minecraft.getInstance()
-					.getMainRenderTarget());
+					.gameRenderer.mainRenderTarget());
 		} else {
 			renderTarget = Minecraft.getInstance()
-					.getMainRenderTarget();
+					.gameRenderer.mainRenderTarget();
 		}
 
 		maybeResizeFBO(renderTarget.width, renderTarget.height);
@@ -85,11 +88,11 @@ public class OitFramebuffer {
 		// No depth writes, but we'll still use the depth test.
 		GlStateManager._depthMask(false);
 		GlStateManager._colorMask(ColorTargetState.WRITE_ALL);
-		GlStateManager._enableBlend();
+		GlStateManager._enableBlend(0);
 		GlStateManager._blendFuncSeparate(GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE);
 		GL32.glBlendEquation(GlConst.GL_MAX);
 
-		float far = Minecraft.getInstance().gameRenderer.getGameRenderState().levelRenderState.cameraRenderState.depthFar;
+		float far = Minecraft.getInstance().gameRenderer.gameRenderState().levelRenderState.cameraRenderState.depthFar;
 
 		if (GlCompat.SUPPORTS_DSA) {
 			GL46.glNamedFramebufferDrawBuffers(fbo, DEPTH_RANGE_DRAW_BUFFERS);
@@ -108,7 +111,7 @@ public class OitFramebuffer {
 		// No depth writes, but we'll still use the depth test
 		GlStateManager._depthMask(false);
 		GlStateManager._colorMask(ColorTargetState.WRITE_ALL);
-		GlStateManager._enableBlend();
+		GlStateManager._enableBlend(0);
 		GlStateManager._blendFuncSeparate(GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE);
 		GL32.glBlendEquation(GlConst.GL_FUNC_ADD);
 
@@ -134,7 +137,7 @@ public class OitFramebuffer {
 		// Only write to depth, not color.
 		GlStateManager._depthMask(true);
 		GlStateManager._colorMask(ColorTargetState.WRITE_NONE);
-		GlStateManager._disableBlend();
+		GlStateManager._disableBlend(0);
 		GlStateManager._depthFunc(GlConst.GL_ALWAYS);
 
 		if (GlCompat.SUPPORTS_DSA) {
@@ -156,7 +159,7 @@ public class OitFramebuffer {
 		// No depth writes, but we'll still use the depth test
 		GlStateManager._depthMask(false);
 		GlStateManager._colorMask(ColorTargetState.WRITE_ALL);
-		GlStateManager._enableBlend();
+		GlStateManager._enableBlend(0);
 		GlStateManager._blendFuncSeparate(GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE);
 		GL32.glBlendEquation(GlConst.GL_FUNC_ADD);
 
@@ -175,10 +178,10 @@ public class OitFramebuffer {
 	 * Composite the accumulated luminance onto the main framebuffer.
 	 */
 	public void composite() {
-		if (Minecraft.useShaderTransparency()) {
-			bindRenderTarget(Minecraft.getInstance().levelRenderer.getItemEntityTarget());
+		if (Minecraft.getInstance().options.improvedTransparency().get()) {
+			bindRenderTarget(Minecraft.getInstance().levelRenderer.itemEntityTarget());
 		} else {
-			bindRenderTarget(Minecraft.getInstance().getMainRenderTarget());
+			bindRenderTarget(Minecraft.getInstance().gameRenderer.mainRenderTarget());
 		}
 
 		// The composite shader writes out the closest depth to gl_FragDepth.
@@ -187,7 +190,7 @@ public class OitFramebuffer {
 		// If Neo gets wavelet OIT we can use their hooks to be correct with everything.
 		GlStateManager._depthMask(true);
 		GlStateManager._colorMask(ColorTargetState.WRITE_ALL);
-		GlStateManager._enableBlend();
+		GlStateManager._enableBlend(0);
 
 		// We rely on the blend func to achieve:
 		// final color = (1 - transmittance_total) * sum(color_f * alpha_f * transmittance_f) / sum(alpha_f * transmittance_f)
@@ -207,14 +210,15 @@ public class OitFramebuffer {
 
 		drawFullscreenQuad();
 
-		bindRenderTarget(Minecraft.getInstance().getMainRenderTarget());
+		bindRenderTarget(Minecraft.getInstance().gameRenderer.mainRenderTarget());
 	}
 
 	private static void bindRenderTarget(RenderTarget target) {
 		GlTexture colorTexture = (GlTexture) target.getColorTexture();
-		int i = colorTexture.getFbo(
+		int i = GlUtil.getGlDevice().frameBufferCache().getFbo(
 				GlUtil.getGlDevice().directStateAccess(),
-				target.getDepthTexture()
+				List.of((FrameBufferAttachment) target.getColorTexture()),
+				(FrameBufferAttachment) target.getDepthTexture()
 		);
 		GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, i);
 		GlStateManager._viewport(0, 0, colorTexture.getWidth(0), colorTexture.getHeight(0));
